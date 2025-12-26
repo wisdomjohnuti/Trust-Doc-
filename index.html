@@ -45,9 +45,8 @@
 ‎</div>
 ‎
 ‎<script>
-  const supabaseClient = window.supabase.createClient(
-‎    "https://cdhixtigmdszjkpbmzhs.supabase.co
-‎",
+‎  const supabaseClient = window.supabase.createClient(
+‎    "https://cdhixtigmdszjkpbmzhs.supabase.co",
 ‎    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkaGl4dGlnbWRzemprcGJtemhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3NzcwMDgsImV4cCI6MjA4MjM1MzAwOH0.PAuVbbvHIMmHX9RC-_sQcoCaXg07rHYd_SbeDjVHNto
 ‎"
 ‎  );
@@ -55,20 +54,30 @@
 ‎  async function signUp() {
 ‎    const email = document.getElementById("email").value;
 ‎    const password = document.getElementById("password").value;
-‎    const { error } = await supabase.auth.signUp({ email, password });
+‎
+‎    const { error } = await supabaseClient.auth.signUp({
+‎      email,
+‎      password
+‎    });
+‎
 ‎    alert(error ? error.message : "Signup successful! Check your email.");
 ‎  }
 ‎
 ‎  async function signIn() {
 ‎    const email = document.getElementById("email").value;
 ‎    const password = document.getElementById("password").value;
-‎    const { error } = await supabase.auth.signInWithPassword({ email, password });
+‎
+‎    const { error } = await supabaseClient.auth.signInWithPassword({
+‎      email,
+‎      password
+‎    });
+‎
 ‎    if (error) alert(error.message);
 ‎    else showUser();
 ‎  }
 ‎
 ‎  async function logout() {
-‎    await supabase.auth.signOut();
+‎    await supabaseClient.auth.signOut();
 ‎    location.reload();
 ‎  }
 ‎
@@ -77,11 +86,8 @@
 ‎    document.getElementById("user").style.display = "block";
 ‎  }
 ‎
-‎  supabase.auth.getSession().then(({ data }) => {
+‎  supabaseClient.auth.getSession().then(({ data }) => {
 ‎    if (data.session) showUser();
 ‎  });
 ‎</script>
-‎
-‎</body>
-‎</html>
-‎
+‎‎
