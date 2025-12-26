@@ -1,22 +1,87 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title>TrustDoc - Early Access</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1>Keep Your Important Documents Safe — Forever Verified</h1>
-  <p>Upload, store, and instantly prove the authenticity of your PDFs.</p>
-
-  <a href="https://forms.gle/YOUR_FORM_ID" target="_blank">
-    <button>Get Early Access – Free 🛡️</button>
-  </a>
-
-  <h2>Why TrustDoc Exists</h2>
-  <p>
-    Important PDFs aren’t just files — they’re your future.  
-    Lost certificates, missing contracts, and unverified documents cause stress every day.  
-    TrustDoc gives you one secure place to keep them, and a verification code that proves they’re real.
-  </p>
-</body>
-</html>
+‎<html>
+‎<head>
+‎  <title>TrustDoc – Secure PDF Verification</title>
+‎  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+‎  <style>
+‎    body {
+‎      font-family: Arial, sans-serif;
+‎      background: #f7f9fb;
+‎      text-align: center;
+‎      padding: 40px;
+‎      color: #0A2540;
+‎    }
+‎    input, button {
+‎      padding: 12px;
+‎      margin: 8px;
+‎      width: 260px;
+‎    }
+‎    button {
+‎      background: #0A2540;
+‎      color: white;
+‎      border: none;
+‎      cursor: pointer;
+‎    }
+‎    button:hover {
+‎      background: #163a6b;
+‎    }
+‎  </style>
+‎</head>
+‎<body>
+‎
+‎<h1>TrustDoc</h1>
+‎<p>Secure your important PDFs and verify them anytime.</p>
+‎
+‎<div id="auth">
+‎  <input id="email" type="email" placeholder="Email" /><br>
+‎  <input id="password" type="password" placeholder="Password" /><br>
+‎  <button onclick="signUp()">Sign Up</button>
+‎  <button onclick="signIn()">Login</button>
+‎</div>
+‎
+‎<div id="user" style="display:none;">
+‎  <h2>You are logged in ✅</h2>
+‎  <button onclick="logout()">Logout</button>
+‎</div>
+‎
+‎<script>
+‎  const supabase = supabase.createClient(
+‎    "https://cdhixtigmdszjkpbmzhs.supabase.co
+‎",
+‎    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkaGl4dGlnbWRzemprcGJtemhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3NzcwMDgsImV4cCI6MjA4MjM1MzAwOH0.PAuVbbvHIMmHX9RC-_sQcoCaXg07rHYd_SbeDjVHNto
+‎"
+‎  );
+‎
+‎  async function signUp() {
+‎    const email = document.getElementById("email").value;
+‎    const password = document.getElementById("password").value;
+‎    const { error } = await supabase.auth.signUp({ email, password });
+‎    alert(error ? error.message : "Signup successful! Check your email.");
+‎  }
+‎
+‎  async function signIn() {
+‎    const email = document.getElementById("email").value;
+‎    const password = document.getElementById("password").value;
+‎    const { error } = await supabase.auth.signInWithPassword({ email, password });
+‎    if (error) alert(error.message);
+‎    else showUser();
+‎  }
+‎
+‎  async function logout() {
+‎    await supabase.auth.signOut();
+‎    location.reload();
+‎  }
+‎
+‎  async function showUser() {
+‎    document.getElementById("auth").style.display = "none";
+‎    document.getElementById("user").style.display = "block";
+‎  }
+‎
+‎  supabase.auth.getSession().then(({ data }) => {
+‎    if (data.session) showUser();
+‎  });
+‎</script>
+‎
+‎</body>
+‎</html>
+‎
