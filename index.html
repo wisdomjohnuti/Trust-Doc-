@@ -3,7 +3,7 @@
 <head>
   <title>TrustDoc</title>
 
-  <!-- ✅ CORRECT SUPABASE BROWSER SCRIPT -->
+  <!-- Supabase browser build -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
   <style>
@@ -11,66 +11,87 @@
       font-family: Arial, sans-serif;
       padding: 40px;
       text-align: center;
+      background: #f7f9fb;
+      color: #0A2540;
     }
+
     input, button {
       padding: 10px;
       margin: 6px;
-      width: 240px;
+      width: 260px;
     }
+
     button {
       cursor: pointer;
+      background: #0A2540;
+      color: white;
+      border: none;
+    }
+
+    button:hover {
+      background: #163a6b;
+    }
+
+    .box {
+      max-width: 420px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
     }
   </style>
 </head>
 <body>
 
-<h1>TrustDoc</h1>
-<p>Secure your important PDFs and verify them anytime.</p>
+<!-- 🔐 AUTH SECTION -->
+<div id="auth" class="box">
+  <h1>TrustDoc</h1>
+  <p>Secure your important PDFs and verify them anytime.</p>
 
-<div id="auth">
   <input id="email" type="email" placeholder="Email"><br>
   <input id="password" type="password" placeholder="Password"><br>
-  <button type="button" onclick="signUp()">Sign Up</button>
-  <button type="button" onclick="signIn()">Login</button>
+
+  <button onclick="signUp()">Sign Up</button><br>
+  <button onclick="signIn()">Login</button>
 </div>
 
-<div id="user" style="display:none;">
-  <h2>You are logged in ✅</h2>
+<!-- ✅ APP SECTION (HIDDEN BY DEFAULT) -->
+<div id="app" class="box" style="display:none;">
+  <h2>Welcome to TrustDoc ✅</h2>
+  <p>You are logged in.</p>
+
+  <p>
+    Soon you will be able to:
+    <br>🔐 Upload PDFs
+    <br>🔎 Verify documents
+    <br>📄 Share proof links
+  </p>
+
   <button onclick="logout()">Logout</button>
 </div>
 
 <script>
-  // ✅ SUPABASE CLIENT (YOUR REAL KEYS)
   const supabaseClient = window.supabase.createClient(
     "https://cdhixtigmdszjkpbmzhs.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkaGl4dGlnbWRzemprcGJtemhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3NzcwMDgsImV4cCI6MjA4MjM1MzAwOH0.PAuVbbvHIMmHX9RC-_sQcoCaXg07rHYd_SbeDjVHNto"
   );
 
   async function signUp() {
-    alert("Button clicked ✅"); // DEBUG CHECK
+    const email = emailInput();
+    const password = passwordInput();
 
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-
-    const { error } = await supabaseClient.auth.signUp({
-      email,
-      password
-    });
-
-    alert(error ? error.message : "Signup successful! Check your email.");
+    const { error } = await supabaseClient.auth.signUp({ email, password });
+    alert(error ? error.message : "Signup successful! You can now login.");
   }
 
   async function signIn() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    const email = emailInput();
+    const password = passwordInput();
 
-    const { error } = await supabaseClient.auth.signInWithPassword({
-      email,
-      password
-    });
-
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
     if (error) alert(error.message);
-    else showUser();
+    else showApp();
   }
 
   async function logout() {
@@ -78,15 +99,23 @@
     location.reload();
   }
 
-  function showUser() {
+  function showApp() {
     document.getElementById("auth").style.display = "none";
-    document.getElementById("user").style.display = "block";
+    document.getElementById("app").style.display = "block";
+  }
+
+  function emailInput() {
+    return document.getElementById("email").value;
+  }
+
+  function passwordInput() {
+    return document.getElementById("password").value;
   }
 
   supabaseClient.auth.getSession().then(({ data }) => {
-    if (data.session) showUser();
+    if (data.session) showApp();
   });
 </script>
 
 </body>
-    </html>
+</html>
