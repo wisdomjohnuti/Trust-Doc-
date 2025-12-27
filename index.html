@@ -205,15 +205,23 @@
     if (error) return;
 
     data.forEach(doc => {
-      const li = document.createElement("li");
-      li.innerHTML = `
-        📄 ${doc.file_name}<br>
-        🔐 Code: <b>${doc.verification_code}</b>
-      `;
-      list.appendChild(li);
-    });
-  }
+  const li = document.createElement("li");
+  li.style.marginBottom = "15px";
 
+  li.innerHTML = `
+    📄 <b>${doc.file_name}</b><br>
+    🔐 Code: <b>${doc.verification_code}</b><br>
+    <a 
+      href="verify.html?code=${doc.verification_code}" 
+      target="_blank"
+      style="display:inline-block;margin-top:6px;color:#0A2540;font-weight:bold;"
+    >
+      🔎 Verify document
+    </a>
+  `;
+
+  list.appendChild(li);
+});
   // Load documents when logged in
   supabaseClient.auth.getSession().then(({ data }) => {
     if (data.session) loadDocuments();
