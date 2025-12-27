@@ -59,9 +59,17 @@
 <!-- ✅ APP SECTION (HIDDEN BY DEFAULT) -->
 <div id="app" class="box" style="display:none;">
   <h2>Welcome to TrustDoc ✅</h2>
-  <p>You are logged in.</p>
+  <p>Upload a PDF to secure and verify it.</p>
 
-  <p>
+  <input type="file" id="pdfFile" accept="application/pdf"><br>
+  <button onclick="uploadPDF()">Upload PDF</button>
+
+  <div id="uploadStatus"></div>
+
+  <h3>Your Documents</h3>
+  <ul id="docList"></ul>
+
+  <button onclick="logout()">Logout</button>
     Soon you will be able to:
     <br>🔐 Upload PDFs
     <br>🔎 Verify documents
@@ -119,3 +127,95 @@
 
 </body>
 </html>
+<script>
+  async function uploadPDF() {
+    const fileInput = document.getElementById("pdfFile");
+    const status = document.getElementById("uploadStatus");
+
+    if (!fileInput.files.length) {
+      alert("Please select a PDF file");
+      return;
+    }
+
+    const file = fileInput.files[0];
+
+    if (file.type !== "application/pdf") {
+      alert("Only PDF files are allowed");
+      return;
+    }
+
+    status.innerText = "Uploading...";
+
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    const user = sessionData.session.user;
+
+    const filePath = `${user.id}/${Date.now()}_${file.name}`;
+
+    const { error: uploadError } = await supabaseClient
+      .storage
+      .from("documents")
+      .upload(filePath, file);
+
+    if (uploadError) {
+      status.innerText = uploadError.message;
+      return;
+    }
+
+    const { data: urlData } = supabaseClient
+      .storage
+      .from("documents")
+      .getPublicUrl(filePath);
+
+    const verificationCode =
+      "TD-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+    const { error: dbError } = await supabaseClient
+      .from("documents")
+      .insert({
+        user_id: user.id,
+        file_name: file.name,
+        file_url: urlData.publicUrl,
+        verification_code: verificationCode
+      });
+
+    if (dbError) {
+      status.innerText = dbError.message;
+      return;
+    }
+
+    status.innerHTML =
+      "✅ Uploaded successfully<br>Verification Code: <b>" + verificationCode + "</b>";
+
+    loadDocuments();
+  }
+
+  async function loadDocuments() {
+    const list = document.getElementById("docList");
+    list.innerHTML = "";
+
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    const user = sessionData.session.user;
+
+    const { data, error } = await supabaseClient
+      .from("documents")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) return;
+
+    data.forEach(doc => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        📄 ${doc.file_name}<br>
+        🔐 Code: <b>${doc.verification_code}</b>
+      `;
+      list.appendChild(li);
+    });
+  }
+
+  // Load documents when logged in
+  supabaseClient.auth.getSession().then(({ data }) => {
+    if (data.session) loadDocuments();
+  });
+</script>
