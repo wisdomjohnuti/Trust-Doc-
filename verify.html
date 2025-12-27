@@ -57,22 +57,26 @@
   <h1>Verify Document</h1>
   <p>Enter a TrustDoc verification code to confirm authenticity.</p>
 
-<input id="codeInput" placeholder="e.g. TD-A9F3KQ"><br> <button onclick="verifyDoc()">Verify</button>
+  <input id="codeInput" placeholder="e.g. TD-A9F3KQ"><br>
+  <button onclick="verifyDoc()">Verify</button>
 
   <div id="result"></div>
 </div>
 
-<script>const params = new URLSearchParams(window.location.search);
-const prefilledCode = params.get("code");
-
-if (prefilledCode) {
-  document.getElementById("codeInput").value = prefilledCode;
-  verifyDoc();
-}
+<script>
   const supabaseClient = window.supabase.createClient(
     "https://cdhixtigmdszjkpbmzhs.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkaGl4dGlnbWRzemprcGJtemhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3NzcwMDgsImV4cCI6MjA4MjM1MzAwOH0.PAuVbbvHIMmHX9RC-_sQcoCaXg07rHYd_SbeDjVHNto"
   );
+
+  // Auto-fill verification code from URL
+  const params = new URLSearchParams(window.location.search);
+  const prefilledCode = params.get("code");
+
+  if (prefilledCode) {
+    document.getElementById("codeInput").value = prefilledCode;
+    verifyDoc();
+  }
 
   async function verifyDoc() {
     const code = document.getElementById("codeInput").value.trim();
@@ -106,4 +110,4 @@ if (prefilledCode) {
 </script>
 
 </body>
-    </html>
+</html>
